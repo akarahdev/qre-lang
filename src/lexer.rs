@@ -8,7 +8,7 @@ use std::str::Chars;
 pub struct Lexer {
     file_name: String,
     file_contents: String,
-    tokens: Vec<Token>,
+    pub(crate) tokens: Vec<Token>,
 
     character_offset: usize,
 

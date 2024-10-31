@@ -6,10 +6,30 @@ mod span;
 mod tokens;
 
 fn main() {
-    let file = read_to_string("./example/hello.qre").unwrap();
 
-    let mut lexer = Lexer::new("./example/hello.qre".to_string(), file);
-    let tokens = lexer.lex();
 
-    println!("{:?}", tokens);
+    let entries = std::fs::read_dir("./src/").unwrap();
+
+    let mut handles = vec![];
+    for entry in entries {
+        handles.push(std::thread::spawn(move || {
+            let path = entry.unwrap().path().to_str().unwrap().to_string();
+            let file = read_to_string(&path).unwrap();
+            let mut lexer = Lexer::new(path, file);
+            let _ = lexer.lex();
+            lexer.tokens
+        }));
+    }
+
+    let results = handles
+        .into_iter()
+        .map(|thread| thread.join().unwrap())
+        .flatten()
+        .collect::<Vec<_>>();
+
+    println!("Results: {:?}", results);
+
+
+
+
 }
