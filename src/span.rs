@@ -1,7 +1,8 @@
+#[derive(Clone, Debug)]
 pub struct Span {
-    row_start: u32,
-    row_end: u32,
-    column_start: u32,
-    column_end: u32,
-    file_name: String,
+    pub row_start: usize,
+    pub row_end: usize,
+    pub column_start: usize,
+    pub column_end: usize,
+    pub file_name: String,
 }

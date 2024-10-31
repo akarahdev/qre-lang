@@ -1,15 +1,18 @@
 use crate::span::Span;
 
+#[derive(Clone, Debug)]
 pub struct Token {
-    token_type: TokenType,
-    span: Span
+    pub token_type: TokenType,
+    pub span: Span,
 }
 
+#[derive(Clone, Debug)]
 pub enum TokenType {
     Identifier { content: String },
     StringValue { content: String },
     CStringValue { content: String },
     Comment { content: String },
+    Number { content: String },
 
     OpenParen,
     CloseParen,
@@ -23,6 +26,7 @@ pub enum TokenType {
     DoubleColon,
     Semicolon,
     Dot,
+    DoubleDot,
     Arrow,
 
     Tilde,
@@ -50,5 +54,7 @@ pub enum TokenType {
     GreaterThanOrEqual,
     Equal,
     NotEqual,
-    DoubleEqual
+    DoubleEqual,
+
+    NewLine,
 }
