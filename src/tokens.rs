@@ -10,9 +10,20 @@ pub struct Token {
 pub enum TokenType {
     Identifier { content: String },
     StringValue { content: String },
-    CStringValue { content: String },
     Comment { content: String },
     Number { content: String },
+
+    ImportKeyword,
+    FnKeyword,
+    StructKeyword,
+    IfKeyword,
+    ElseKeyword,
+    WhileKeyword,
+    LoopKeyword,
+    BreakKeyword,
+    InterfaceKeyword,
+    ForEachKeyword,
+    CKeyword,
 
     OpenParen,
     CloseParen,

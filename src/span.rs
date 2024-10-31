@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 #[derive(Clone, Debug)]
 pub struct Span {
     pub row_start: usize,
