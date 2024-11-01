@@ -1,9 +1,5 @@
 use crate::span::Span;
 use crate::tokens::{Token, TokenType};
-use std::collections::HashMap;
-use std::iter::Peekable;
-use std::ops::{Add, RangeBounds};
-use std::str::Chars;
 
 pub struct Lexer {
     file_name: String,

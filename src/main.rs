@@ -1,6 +1,7 @@
+#![allow(dead_code)]
+
 use crate::lexer::Lexer;
 use std::fs::read_to_string;
-
 mod ast;
 mod lexer;
 mod parser;
