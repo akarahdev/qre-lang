@@ -1,3 +1,5 @@
+use std::cell::OnceCell;
+
 enum AstHeader {
     Function {
         name: String,
@@ -15,13 +17,9 @@ enum AstStatement {
     Comment(String),
     Expression(AstExpression),
 
-    DeclareVariable {
-        name: String,
-        type_hint: AstType,
-        value: AstExpression,
-    },
     ModifyVariable {
         name: String,
+        ty: OnceCell<AstType>,
         value: AstExpression,
     },
     IfStatement {
@@ -36,21 +34,22 @@ enum AstStatement {
 }
 
 enum AstExpression {
-    NumberLiteral(String),
-    StringLiteral(String),
-    VariableLiteral(String),
-    ArrayLiteral(Vec<AstExpression>),
+    NumberLiteral(String, OnceCell<AstType>),
+    StringLiteral(String, OnceCell<AstType>),
+    VariableLiteral(String, OnceCell<AstType>),
+    ArrayLiteral(Vec<AstExpression>, OnceCell<AstType>),
     StructureLiteral(AstType, Vec<(String, AstExpression)>),
 
-    Add(Box<AstExpression>, Box<AstExpression>),
-    Sub(Box<AstExpression>, Box<AstExpression>),
-    Mul(Box<AstExpression>, Box<AstExpression>),
-    Div(Box<AstExpression>, Box<AstExpression>),
-    Mod(Box<AstExpression>, Box<AstExpression>),
+    Add(OnceCell<AstType>, Box<AstExpression>, Box<AstExpression>),
+    Sub(OnceCell<AstType>,Box<AstExpression>, Box<AstExpression>),
+    Mul(OnceCell<AstType>,Box<AstExpression>, Box<AstExpression>),
+    Div(OnceCell<AstType>,Box<AstExpression>, Box<AstExpression>),
+    Mod(OnceCell<AstType>,Box<AstExpression>, Box<AstExpression>),
 
     Invoke {
         receiver: Box<AstExpression>,
         arguments: Vec<AstExpression>,
+        return_type: OnceCell<AstType>
     },
 }
 
@@ -60,6 +59,5 @@ enum AstType {
     Float32,
     Float64,
     ArrayOf(Box<AstType>),
-    Structure(String),
-    Inferred,
+    Structure(String)
 }
