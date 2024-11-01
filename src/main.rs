@@ -1,15 +1,13 @@
 use crate::lexer::Lexer;
 use std::fs::read_to_string;
 
+mod ast;
 mod lexer;
+mod parser;
 mod span;
 mod tokens;
-mod parser;
-mod ast;
 
 fn main() {
-
-
     let entries = std::fs::read_dir("./src/").unwrap();
 
     let mut handles = vec![];
