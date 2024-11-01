@@ -1,6 +1,6 @@
 use std::cell::OnceCell;
 
-enum AstHeader {
+pub enum AstHeader {
     Function {
         name: String,
         parameters: Vec<(AstType, String)>,
@@ -9,11 +9,11 @@ enum AstHeader {
     },
 }
 
-struct AstCodeBlock {
+pub struct AstCodeBlock {
     statements: Vec<AstStatement>,
 }
 
-enum AstStatement {
+pub enum AstStatement {
     Comment(String),
     Expression(AstExpression),
 
@@ -33,7 +33,7 @@ enum AstStatement {
     },
 }
 
-enum AstExpression {
+pub enum AstExpression {
     NumberLiteral(String, OnceCell<AstType>),
     StringLiteral(String, OnceCell<AstType>),
     VariableLiteral(String, OnceCell<AstType>),
@@ -53,7 +53,7 @@ enum AstExpression {
     },
 }
 
-enum AstType {
+pub enum AstType {
     Int32,
     Int64,
     Float32,

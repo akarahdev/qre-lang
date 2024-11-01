@@ -2,6 +2,8 @@
 
 use crate::frontend::lexer::Lexer;
 use std::fs::read_to_string;
+use crate::frontend::parser::Parser;
+
 mod frontend;
 
 fn main() {
@@ -24,5 +26,10 @@ fn main() {
         .flatten()
         .collect::<Vec<_>>();
 
-    println!("Results: {:?}", tokens);
+    println!("Results: {:#?}", tokens);
+
+    let parser = Parser {
+        tokens: &tokens.iter()
+    };
+
 }
