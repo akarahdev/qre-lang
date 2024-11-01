@@ -4,6 +4,8 @@ use std::fs::read_to_string;
 mod lexer;
 mod span;
 mod tokens;
+mod parser;
+mod ast;
 
 fn main() {
 
@@ -21,15 +23,11 @@ fn main() {
         }));
     }
 
-    let results = handles
+    let tokens = handles
         .into_iter()
         .map(|thread| thread.join().unwrap())
         .flatten()
         .collect::<Vec<_>>();
 
-    println!("Results: {:?}", results);
-
-
-
-
+    println!("Results: {:?}", tokens);
 }
