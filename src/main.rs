@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 
-use crate::frontend::lexer::Lexer;
+use crate::frontend::lexer::structs::Lexer;
 use std::fs::read_to_string;
-use crate::frontend::parser::Parser;
+use crate::frontend::parser::structs::Parser;
 
 mod frontend;
 

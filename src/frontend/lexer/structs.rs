@@ -1,10 +1,10 @@
 use crate::frontend::span::Span;
-use crate::frontend::tokens::{Token, TokenType};
+use crate::frontend::lexer::tokens::{Token, TokenType};
 
 pub struct Lexer {
     file_name: String,
     file_contents: String,
-    pub(crate) tokens: Vec<Token>,
+    pub tokens: Vec<Token>,
 
     character_offset: usize,
 
