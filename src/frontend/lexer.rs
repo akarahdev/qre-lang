@@ -1,5 +1,5 @@
-use crate::span::Span;
-use crate::tokens::{Token, TokenType};
+use crate::frontend::span::Span;
+use crate::frontend::tokens::{Token, TokenType};
 
 pub struct Lexer {
     file_name: String,

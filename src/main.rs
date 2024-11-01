@@ -1,12 +1,8 @@
 #![allow(dead_code)]
 
-use crate::lexer::Lexer;
+use crate::frontend::lexer::Lexer;
 use std::fs::read_to_string;
-mod ast;
-mod lexer;
-mod parser;
-mod span;
-mod tokens;
+mod frontend;
 
 fn main() {
     let entries = std::fs::read_dir("./src/").unwrap();
