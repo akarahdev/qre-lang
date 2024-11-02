@@ -1,10 +1,12 @@
 use std::cell::OnceCell;
+use crate::frontend::lexer::tokens::Token;
+use crate::frontend::span::Span;
 
 #[derive(Debug, Clone)]
 pub enum AstHeader {
     Import(String),
     Function {
-        name: String,
+        name: PathData,
         parameters: Vec<(AstType, String)>,
         returns: AstType,
         code_block: AstCodeBlock,
@@ -13,7 +15,7 @@ pub enum AstHeader {
 
 #[derive(Debug, Clone)]
 pub struct AstCodeBlock {
-    pub(crate) statements: Vec<AstStatement>,
+    pub statements: Vec<AstStatement>
 }
 
 #[derive(Debug, Clone)]
@@ -38,23 +40,33 @@ pub enum AstStatement {
 }
 
 #[derive(Debug, Clone)]
-pub enum AstExpression {
-    NumberLiteral(String, OnceCell<AstType>),
-    StringLiteral(String, OnceCell<AstType>),
-    VariableLiteral(String, OnceCell<AstType>),
-    ArrayLiteral(Vec<AstExpression>, OnceCell<AstType>),
-    StructureLiteral(AstType, Vec<(String, AstExpression)>),
+pub struct PathData {
+    pub(crate) name: String, 
+    pub(crate) tokens: Vec<Token>
+}
 
-    Add(OnceCell<AstType>, Box<AstExpression>, Box<AstExpression>),
-    Sub(OnceCell<AstType>, Box<AstExpression>, Box<AstExpression>),
-    Mul(OnceCell<AstType>, Box<AstExpression>, Box<AstExpression>),
-    Div(OnceCell<AstType>, Box<AstExpression>, Box<AstExpression>),
-    Mod(OnceCell<AstType>, Box<AstExpression>, Box<AstExpression>),
+#[derive(Debug, Clone)]
+pub enum AstExpression {
+    NumberLiteral { content: String, ty: OnceCell<AstType>, token: Token },
+    StringLiteral { content: String, ty: OnceCell<AstType>, token: Token },
+    VariableLiteral { content: String, ty: OnceCell<AstType>, token: Token },
+    PathLiteral(PathData),
+    ArrayLiteral { content: Vec<AstExpression>, ty: OnceCell<AstType>, open_bracket_tok: Token, close_bracket_tok: Token },
+    StructureLiteral { ty: AstType, fields: Vec<(String, AstExpression)> },
+    TypeLiteral { ty: AstType, token: Token },
+
+    Add { ty: OnceCell<AstType>, lhs: Box<AstExpression>, rhs: Box<AstExpression>, op_tok: Token },
+    Sub { ty: OnceCell<AstType>, lhs: Box<AstExpression>, rhs: Box<AstExpression>, op_tok: Token },
+    Mul { ty: OnceCell<AstType>, lhs: Box<AstExpression>, rhs: Box<AstExpression>, op_tok: Token },
+    Div { ty: OnceCell<AstType>, lhs: Box<AstExpression>, rhs: Box<AstExpression>, op_tok: Token },
+    Mod { ty: OnceCell<AstType>, lhs: Box<AstExpression>, rhs: Box<AstExpression>, op_tok: Token },
 
     Invoke {
         receiver: Box<AstExpression>,
         arguments: Vec<AstExpression>,
         return_type: OnceCell<AstType>,
+        open_paren_span: Token,
+        close_paren_tok: Token
     },
 }
 
@@ -65,5 +77,5 @@ pub enum AstType {
     Float32,
     Float64,
     ArrayOf(Box<AstType>),
-    Structure(String),
+    Structure(PathData),
 }

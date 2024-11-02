@@ -1,9 +1,10 @@
 use crate::frontend::lexer::iter::TokenIterator;
 use crate::frontend::lexer::tokens::{Token, TokenType};
 use crate::frontend::parser::ast::AstHeader::{Function, Import};
-use crate::frontend::parser::ast::{AstCodeBlock, AstHeader, AstType};
+use crate::frontend::parser::ast::{AstCodeBlock, AstExpression, AstHeader, AstType, PathData};
 use crate::frontend::span::Span;
 use std::cell::OnceCell;
+use std::cmp::PartialEq;
 use std::fmt::format;
 use std::iter::Peekable;
 use std::ops::Add;
@@ -12,7 +13,7 @@ use std::ops::Add;
 macro_rules! match_token_type {
     (in $self:expr, let $name:ident: $ty:expr => $token_type:pat) => {
         $self.tokens.skip_newline();
-        let Some($name) = $self.tokens.next() else {
+        let Some($name) = $self.tokens.next().clone() else {
             $self.errors.push((
                 "expected OpenParen, found EOF".to_string(),
                 $self.tokens.vector.last().unwrap().clone().span,
@@ -59,7 +60,7 @@ impl Parser {
         };
         match keyword_tok.token_type {
             TokenType::ImportKeyword => match self.parse_identifier() {
-                Ok(path) => Some(Import(path)),
+                Ok(path) => Some(Import(path.name)),
                 Err(err) => {
                     self.errors.push(err);
                     None
@@ -73,14 +74,16 @@ impl Parser {
                 };
                 match_token_type!(in self, let open_paren_tok: TokenType::OpenParen => TokenType::OpenParen);
                 match_token_type!(in self, let close_paren_tok: TokenType::CloseParen => TokenType::CloseParen);
-                match_token_type!(in self, let open_brace_tok: TokenType::OpenBrace => TokenType::OpenBrace);
-                match_token_type!(in self, let close_brace_tok: TokenType::CloseBrace => TokenType::CloseBrace);
+                match_token_type!(in self, let arrow_tok: TokenType::Arrow => TokenType::Arrow);
 
+                let Some(code_block) = self.parse_code_block() else {
+                    return None;
+                };
                 Some(AstHeader::Function {
                     name: function_name,
                     parameters: vec![],
                     returns: AstType::Int32,
-                    code_block: AstCodeBlock { statements: vec![] },
+                    code_block,
                 })
             }
             TokenType::StructKeyword => {
@@ -103,8 +106,17 @@ impl Parser {
         }
     }
 
-    fn parse_identifier(&mut self) -> Result<String, (String, Span)> {
+    fn parse_code_block(&mut self) -> Option<AstCodeBlock> {
+        match_token_type!(in self, let open_brace_tok: TokenType::CloseBrace => TokenType::CloseBrace);
+        
+        match_token_type!(in self, let close_brace_tok: TokenType::CloseBrace => TokenType::CloseBrace);
+
+        Some(AstCodeBlock { statements: vec![] })
+    }
+
+    fn parse_identifier(&mut self) -> Result<PathData, (String, Span)> {
         let mut final_identifier = String::new();
+        let mut tokens = Vec::new();
 
         loop {
             let Some(namespace_token) = self.tokens.next() else {
@@ -126,11 +138,13 @@ impl Parser {
                 _ => {}
             }
 
+            tokens.push(namespace_token.clone());
+
             let Some(possibly_double_colon) = self.tokens.peek() else {
-                return Ok(final_identifier);
+                return Ok(PathData { name: final_identifier, tokens });
             };
             let TokenType::DoubleColon = possibly_double_colon.token_type else {
-                return Ok(final_identifier);
+                return Ok(PathData { name: final_identifier, tokens });
             };
             self.tokens.next();
             final_identifier.push_str("::");
