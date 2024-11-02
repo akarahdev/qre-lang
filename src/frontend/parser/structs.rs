@@ -1,7 +1,7 @@
 use crate::frontend::lexer::iter::TokenIterator;
 use crate::frontend::lexer::tokens::{Token, TokenType};
-use crate::frontend::parser::ast::{AstCodeBlock, AstHeader, AstType};
 use crate::frontend::parser::ast::AstHeader::{Function, Import};
+use crate::frontend::parser::ast::{AstCodeBlock, AstHeader, AstType};
 use crate::frontend::span::Span;
 use std::cell::OnceCell;
 use std::fmt::format;
@@ -80,9 +80,7 @@ impl Parser {
                     name: function_name,
                     parameters: vec![],
                     returns: AstType::Int32,
-                    code_block: AstCodeBlock {
-                        statements: vec![]
-                    },
+                    code_block: AstCodeBlock { statements: vec![] },
                 })
             }
             TokenType::StructKeyword => {
