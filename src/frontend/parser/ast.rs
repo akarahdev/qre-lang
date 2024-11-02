@@ -1,6 +1,8 @@
 use std::cell::OnceCell;
 
+#[derive(Debug, Clone)]
 pub enum AstHeader {
+    Import(String),
     Function {
         name: String,
         parameters: Vec<(AstType, String)>,
@@ -9,10 +11,12 @@ pub enum AstHeader {
     },
 }
 
+#[derive(Debug, Clone)]
 pub struct AstCodeBlock {
-    statements: Vec<AstStatement>,
+    pub(crate) statements: Vec<AstStatement>,
 }
 
+#[derive(Debug, Clone)]
 pub enum AstStatement {
     Comment(String),
     Expression(AstExpression),
@@ -33,6 +37,7 @@ pub enum AstStatement {
     },
 }
 
+#[derive(Debug, Clone)]
 pub enum AstExpression {
     NumberLiteral(String, OnceCell<AstType>),
     StringLiteral(String, OnceCell<AstType>),
@@ -41,23 +46,24 @@ pub enum AstExpression {
     StructureLiteral(AstType, Vec<(String, AstExpression)>),
 
     Add(OnceCell<AstType>, Box<AstExpression>, Box<AstExpression>),
-    Sub(OnceCell<AstType>,Box<AstExpression>, Box<AstExpression>),
-    Mul(OnceCell<AstType>,Box<AstExpression>, Box<AstExpression>),
-    Div(OnceCell<AstType>,Box<AstExpression>, Box<AstExpression>),
-    Mod(OnceCell<AstType>,Box<AstExpression>, Box<AstExpression>),
+    Sub(OnceCell<AstType>, Box<AstExpression>, Box<AstExpression>),
+    Mul(OnceCell<AstType>, Box<AstExpression>, Box<AstExpression>),
+    Div(OnceCell<AstType>, Box<AstExpression>, Box<AstExpression>),
+    Mod(OnceCell<AstType>, Box<AstExpression>, Box<AstExpression>),
 
     Invoke {
         receiver: Box<AstExpression>,
         arguments: Vec<AstExpression>,
-        return_type: OnceCell<AstType>
+        return_type: OnceCell<AstType>,
     },
 }
 
+#[derive(Debug, Clone)]
 pub enum AstType {
     Int32,
     Int64,
     Float32,
     Float64,
     ArrayOf(Box<AstType>),
-    Structure(String)
+    Structure(String),
 }

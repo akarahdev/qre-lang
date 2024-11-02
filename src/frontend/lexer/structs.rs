@@ -1,5 +1,5 @@
-use crate::frontend::span::Span;
 use crate::frontend::lexer::tokens::{Token, TokenType};
+use crate::frontend::span::Span;
 
 pub struct Lexer {
     file_name: String,
@@ -126,6 +126,7 @@ impl Lexer {
                 ' ' | '\t' => {}
                 ':' => {
                     if self.peek_char() == ':' {
+                        self.read_char();
                         self.push_token(TokenType::DoubleColon);
                     } else {
                         self.push_token(TokenType::Colon);
@@ -133,6 +134,7 @@ impl Lexer {
                 }
                 '.' => {
                     if self.peek_char() == '.' {
+                        self.read_char();
                         self.push_token(TokenType::DoubleDot);
                     } else {
                         self.push_token(TokenType::Dot);
@@ -140,6 +142,7 @@ impl Lexer {
                 }
                 '=' => {
                     if self.peek_char() == '=' {
+                        self.read_char();
                         self.push_token(TokenType::DoubleEqual);
                     } else {
                         self.push_token(TokenType::Equal);
@@ -147,6 +150,7 @@ impl Lexer {
                 }
                 '>' => {
                     if self.peek_char() == '=' {
+                        self.read_char();
                         self.push_token(TokenType::GreaterThanOrEqual);
                     } else {
                         self.push_token(TokenType::GreaterThan);
@@ -154,6 +158,7 @@ impl Lexer {
                 }
                 '<' => {
                     if self.peek_char() == '=' {
+                        self.read_char();
                         self.push_token(TokenType::LessThanOrEqual);
                     } else {
                         self.push_token(TokenType::LessThan);
@@ -169,6 +174,7 @@ impl Lexer {
                 '+' => self.push_token(TokenType::Plus),
                 '-' => {
                     if self.peek_char() == '>' {
+                        self.read_char();
                         self.push_token(TokenType::Arrow);
                     } else {
                         self.push_token(TokenType::Minus);
@@ -177,6 +183,7 @@ impl Lexer {
                 '*' => self.push_token(TokenType::Star),
                 '/' => {
                     if self.peek_char() == '/' {
+                        self.read_char();
                         let mut content = String::new();
                         while self.peek_char() != '\n' {
                             content.push(self.read_char());
@@ -200,6 +207,7 @@ impl Lexer {
                 '@' => self.push_token(TokenType::At),
                 '!' => {
                     if self.peek_char() == '=' {
+                        self.read_char();
                         self.push_token(TokenType::NotEqual)
                     } else {
                         self.push_token(TokenType::Exclamation)

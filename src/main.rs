@@ -1,8 +1,9 @@
 #![allow(dead_code)]
 
+use crate::frontend::lexer::iter::TokenIterator;
 use crate::frontend::lexer::structs::Lexer;
-use std::fs::read_to_string;
 use crate::frontend::parser::structs::Parser;
+use std::fs::read_to_string;
 
 mod frontend;
 
@@ -26,10 +27,16 @@ fn main() {
         .flatten()
         .collect::<Vec<_>>();
 
-    println!("Results: {:#?}", tokens);
+    println!("Results: {:#?}", &tokens);
 
-    let parser = Parser {
-        tokens: &tokens.iter()
+    let mut parser = Parser {
+        tokens: TokenIterator {
+            vector: tokens,
+            index: 0usize,
+        },
+        errors: vec![],
     };
+    let ast = parser.parse();
 
+    println!("Parsing: {:#?}", ast);
 }
