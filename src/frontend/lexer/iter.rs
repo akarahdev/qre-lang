@@ -18,17 +18,10 @@ impl TokenIterator {
     }
 
     pub fn skip_newline(&mut self) {
-        loop {
-            if let Some(tok) = self.peek() {
-                match tok.token_type {
-                    TokenType::NewLine => {
-                        self.index += 1;
-                    }
-                    _ => break,
-                }
-            } else {
-                break;
-            }
+        while let Some(tok) = self.peek().clone()
+            && let TokenType::NewLine = tok.token_type
+        {
+            self.next();
         }
     }
 }

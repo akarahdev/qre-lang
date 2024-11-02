@@ -1,7 +1,9 @@
 use crate::frontend::lexer::iter::TokenIterator;
 use crate::frontend::lexer::tokens::{Token, TokenType};
 use crate::frontend::parser::ast::AstHeader::{Function, Import};
-use crate::frontend::parser::ast::{AstCodeBlock, AstExpression, AstHeader, AstType, PathData};
+use crate::frontend::parser::ast::{
+    AstCodeBlock, AstExpression, AstHeader, AstStatement, AstType, PathData,
+};
 use crate::frontend::span::Span;
 use std::cell::OnceCell;
 use std::cmp::PartialEq;
@@ -107,11 +109,135 @@ impl Parser {
     }
 
     fn parse_code_block(&mut self) -> Option<AstCodeBlock> {
-        match_token_type!(in self, let open_brace_tok: TokenType::CloseBrace => TokenType::CloseBrace);
-        
-        match_token_type!(in self, let close_brace_tok: TokenType::CloseBrace => TokenType::CloseBrace);
+        match_token_type!(in self, let open_brace_tok: TokenType::OpenBrace => TokenType::OpenBrace);
 
-        Some(AstCodeBlock { statements: vec![] })
+        let mut stmts = Vec::new();
+        loop {
+            if let Some(peeked) = self.tokens.peek().cloned() {
+                if peeked.token_type == TokenType::CloseBrace {
+                    match_token_type!(in self, let close_brace_tok: TokenType::CloseBrace => TokenType::CloseBrace);
+                    return Some(AstCodeBlock { statements: vec![] });
+                }
+                let stmt = self.parse_statement();
+                match stmt {
+                    Ok(ok) => {
+                        stmts.push(ok);
+                    }
+                    Err(err) => {
+                        while let Some(peeked) = self.tokens.peek().cloned()
+                            && (peeked.token_type != TokenType::Semicolon)
+                        {
+                            self.tokens.next();
+                        }
+                        self.errors.push(err);
+                    }
+                };
+            } else {
+                match_token_type!(in self, let close_brace_tok: TokenType::CloseBrace => TokenType::CloseBrace);
+                return None;
+            }
+        }
+    }
+
+    fn parse_statement(&mut self) -> Result<AstStatement, (String, Span)> {
+        let Some(tok) = self.tokens.peek().cloned() else {
+            return Err((
+                "expected valid statement, found EOF".to_string(),
+                self.tokens.vector.last().cloned().unwrap().span,
+            ));
+        };
+        match tok.token_type {
+            TokenType::LoopKeyword => Err(("loops are not implemented yet".to_string(), tok.span)),
+            TokenType::IfKeyword => Err((
+                "if statements are not implemented yet".to_string(),
+                tok.span,
+            )),
+            _ => Ok(AstStatement::Expression(self.parse_expression()?)),
+        }
+    }
+
+    fn parse_expression(&mut self) -> Result<AstExpression, (String, Span)> {
+        self.parse_factor()
+    }
+
+    fn parse_factor(&mut self) -> Result<AstExpression, (String, Span)> {
+        let mut expr = self.parse_term();
+        while let Some(tok) = self.tokens.peek().cloned()
+            && (tok.token_type == TokenType::Star || tok.token_type == TokenType::Slash)
+        {
+            self.tokens.next();
+            let rhs = self.parse_factor()?;
+            match tok.token_type {
+                TokenType::Star => {
+                    expr = expr.map(|lhs| AstExpression::Mul {
+                        ty: OnceCell::new(),
+                        lhs: Box::new(lhs),
+                        rhs: Box::new(rhs),
+                        op_tok: tok.clone(),
+                    });
+                }
+                TokenType::Slash => {
+                    expr = expr.map(|lhs| AstExpression::Div {
+                        ty: OnceCell::new(),
+                        lhs: Box::new(lhs),
+                        rhs: Box::new(rhs),
+                        op_tok: tok.clone(),
+                    });
+                }
+                _ => {}
+            };
+        }
+        expr
+    }
+
+    fn parse_term(&mut self) -> Result<AstExpression, (String, Span)> {
+        let mut expr = self.parse_base_value();
+        while let Some(tok) = self.tokens.peek().cloned()
+            && (tok.token_type == TokenType::Star || tok.token_type == TokenType::Slash)
+        {
+            self.tokens.next();
+            let rhs = self.parse_base_value()?;
+            match tok.token_type {
+                TokenType::Star => {
+                    expr = expr.map(|lhs| AstExpression::Add {
+                        ty: OnceCell::new(),
+                        lhs: Box::new(lhs),
+                        rhs: Box::new(rhs),
+                        op_tok: tok.clone(),
+                    });
+                }
+                TokenType::Slash => {
+                    expr = expr.map(|lhs| AstExpression::Sub {
+                        ty: OnceCell::new(),
+                        lhs: Box::new(lhs),
+                        rhs: Box::new(rhs),
+                        op_tok: tok.clone(),
+                    });
+                }
+                _ => {}
+            };
+        }
+        expr
+    }
+
+    fn parse_base_value(&mut self) -> Result<AstExpression, (String, Span)> {
+        let Some(tok) = self.tokens.peek().cloned() else {
+            return Err((
+                "expected base value, found EOF".to_string(),
+                self.tokens.vector.last().cloned().unwrap().span
+            ));
+        };
+        match tok.clone().token_type {
+            TokenType::Number { content } => Ok(AstExpression::NumberLiteral {
+                content,
+                ty: OnceCell::new(),
+                token: tok.clone(),
+            }),
+            _ => Err((
+                format!("expected base value, found {:?}", tok.clone().token_type),
+                self.tokens.vector.last().cloned().unwrap().span
+            ))
+        }
     }
 
     fn parse_identifier(&mut self) -> Result<PathData, (String, Span)> {
@@ -141,10 +267,16 @@ impl Parser {
             tokens.push(namespace_token.clone());
 
             let Some(possibly_double_colon) = self.tokens.peek() else {
-                return Ok(PathData { name: final_identifier, tokens });
+                return Ok(PathData {
+                    name: final_identifier,
+                    tokens,
+                });
             };
             let TokenType::DoubleColon = possibly_double_colon.token_type else {
-                return Ok(PathData { name: final_identifier, tokens });
+                return Ok(PathData {
+                    name: final_identifier,
+                    tokens,
+                });
             };
             self.tokens.next();
             final_identifier.push_str("::");
