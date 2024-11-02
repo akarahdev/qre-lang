@@ -123,7 +123,7 @@ impl Lexer {
                         }
                     }
                 }
-                ' ' | '\t' => {}
+                ' ' | '\t' | '\r' | '\n' => {}
                 ':' => {
                     if self.peek_char() == ':' {
                         self.read_char();
@@ -215,9 +215,6 @@ impl Lexer {
                 }
                 '?' => self.push_token(TokenType::QuestionMark),
                 '|' => self.push_token(TokenType::VerticalLine),
-
-                '\r' => {}
-                '\n' => self.push_token(TokenType::NewLine),
 
                 ch => panic!("unknown character `{}`", ch),
             }

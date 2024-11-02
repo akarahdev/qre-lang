@@ -16,12 +16,4 @@ impl TokenIterator {
     pub fn peek(&mut self) -> Option<&Token> {
         self.vector.get(self.index).clone()
     }
-
-    pub fn skip_newline(&mut self) {
-        while let Some(tok) = self.peek().clone()
-            && let TokenType::NewLine = tok.token_type
-        {
-            self.next();
-        }
-    }
 }

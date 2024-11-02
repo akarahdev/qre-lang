@@ -66,6 +66,4 @@ pub enum TokenType {
     Equal,
     NotEqual,
     DoubleEqual,
-
-    NewLine,
 }
