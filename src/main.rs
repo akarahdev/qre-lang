@@ -3,7 +3,7 @@
 
 use crate::frontend::lexer::iter::TokenIterator;
 use crate::frontend::lexer::structs::Lexer;
-use crate::frontend::parser::structs::Parser;
+use frontend::parser::core::Parser;
 use std::fs::read_to_string;
 
 mod frontend;
