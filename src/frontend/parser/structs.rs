@@ -76,13 +76,21 @@ impl Parser {
                 match_token_type!(in self, let close_paren_tok: TokenType::CloseParen => TokenType::CloseParen);
                 match_token_type!(in self, let arrow_tok: TokenType::Arrow => TokenType::Arrow);
 
+                let return_type = match self.parse_type() {
+                    Ok(t) => t,
+                    Err(err) => {
+                        self.errors.push(err);
+                        AstType::Invalid
+                    }
+                };
+
                 let Some(code_block) = self.parse_code_block() else {
                     return None;
                 };
                 Some(AstHeader::Function {
                     name: function_name,
                     parameters: vec![],
-                    returns: AstType::Int32,
+                    returns: return_type,
                     code_block,
                 })
             }
@@ -163,7 +171,6 @@ impl Parser {
     fn parse_factor(&mut self) -> Result<AstExpression, (String, Span)> {
         let mut expr = self.parse_term();
         while let Some(tok) = self.tokens.peek().cloned() {
-
             match tok.token_type {
                 TokenType::Star => {
                     self.tokens.next();
@@ -282,6 +289,18 @@ impl Parser {
             };
             self.tokens.next();
             final_identifier.push_str("::");
+        }
+    }
+
+    fn parse_type(&mut self) -> Result<AstType, (String, Span)> {
+        let identifier = self.parse_identifier()?;
+        match identifier.name.as_str() {
+            "i32" => Ok(AstType::Int32),
+            "i64" => Ok(AstType::Int64),
+            "f32" => Ok(AstType::Float32),
+            "f64" => Ok(AstType::Float64),
+            "void" => Ok(AstType::Void),
+            _ => Ok(AstType::Structure(identifier))
         }
     }
 }

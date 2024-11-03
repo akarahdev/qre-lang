@@ -126,4 +126,6 @@ pub enum AstType {
     Float64,
     ArrayOf(Box<AstType>),
     Structure(PathData),
+    Void,
+    Invalid
 }
