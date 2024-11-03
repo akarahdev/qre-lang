@@ -1,5 +1,4 @@
 use crate::frontend::lexer::tokens::Token;
-use crate::frontend::span::Span;
 use std::cell::OnceCell;
 
 #[derive(Debug, Clone)]

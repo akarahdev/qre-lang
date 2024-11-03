@@ -1,6 +1,4 @@
-use crate::frontend::lexer::tokens::{Token, TokenType};
-use std::io::Read;
-use std::marker::PhantomData;
+use crate::frontend::lexer::tokens::Token;
 
 pub struct TokenIterator {
     pub(crate) vector: Vec<Token>,
