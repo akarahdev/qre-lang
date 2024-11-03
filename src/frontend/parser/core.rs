@@ -16,11 +16,4 @@ impl Parser {
             Result::Err(self.errors.clone())
         }
     }
-
-
-
-
-
-
-
 }

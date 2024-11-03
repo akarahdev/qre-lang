@@ -54,5 +54,4 @@ impl Parser {
             _ => Ok(AstStatement::Expression(self.parse_expression()?)),
         }
     }
-
 }

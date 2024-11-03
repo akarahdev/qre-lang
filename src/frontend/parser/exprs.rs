@@ -1,8 +1,8 @@
-use std::cell::OnceCell;
 use crate::frontend::lexer::tokens::TokenType;
 use crate::frontend::parser::ast::AstExpression;
 use crate::frontend::parser::core::Parser;
 use crate::frontend::span::Span;
+use std::cell::OnceCell;
 
 impl Parser {
     pub(crate) fn parse_expression(&mut self) -> Result<AstExpression, (String, Span)> {

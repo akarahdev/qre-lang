@@ -1,6 +1,6 @@
 use crate::frontend::lexer::tokens::TokenType;
-use crate::frontend::parser::ast::{AstHeader, AstType};
 use crate::frontend::parser::ast::AstHeader::Import;
+use crate::frontend::parser::ast::{AstHeader, AstType};
 use crate::frontend::parser::core::Parser;
 use crate::match_token_type;
 

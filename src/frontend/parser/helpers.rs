@@ -55,7 +55,7 @@ impl Parser {
             "f32" => Ok(AstType::Float32),
             "f64" => Ok(AstType::Float64),
             "void" => Ok(AstType::Void),
-            _ => Ok(AstType::Structure(identifier))
+            _ => Ok(AstType::Structure(identifier)),
         }
     }
 }

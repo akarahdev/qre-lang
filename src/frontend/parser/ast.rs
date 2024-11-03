@@ -126,5 +126,5 @@ pub enum AstType {
     ArrayOf(Box<AstType>),
     Structure(PathData),
     Void,
-    Invalid
+    Invalid,
 }
