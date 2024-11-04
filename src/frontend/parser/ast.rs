@@ -10,6 +10,10 @@ pub enum AstHeader {
         returns: AstType,
         code_block: AstCodeBlock,
     },
+    Struct {
+        name: PathData,
+        fields: Vec<(String, AstType)>
+    }
 }
 
 #[derive(Debug, Clone)]

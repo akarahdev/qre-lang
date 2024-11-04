@@ -30,7 +30,6 @@ impl Parser {
                     }
                 };
                 match_token_type!(in self, let semi_tok: TokenType::Semicolon => TokenType::Semicolon);
-                println!("stmts: {:#?}", stmts);
             } else {
                 match_token_type!(in self, let close_brace_tok: TokenType::CloseBrace => TokenType::CloseBrace);
                 return None;

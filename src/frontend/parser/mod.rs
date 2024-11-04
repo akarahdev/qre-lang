@@ -4,7 +4,6 @@ mod exprs;
 pub mod headers;
 mod helpers;
 mod stmts;
-pub mod structs;
 
 #[macro_export]
 macro_rules! match_token_type {
