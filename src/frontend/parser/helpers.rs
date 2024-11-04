@@ -48,6 +48,27 @@ impl Parser {
     }
 
     pub fn parse_type(&mut self) -> Result<AstType, (String, Span)> {
+        self.parse_type_ops()
+    }
+
+    pub fn parse_type_ops(&mut self) -> Result<AstType, (String, Span)> {
+        let mut ty = self.parse_base_type()?;
+
+        while let Some(tok) = self.tokens.peek().cloned() {
+            match tok.token_type {
+                TokenType::VerticalLine => {
+                    self.tokens.next();
+                    let other_type = self.parse_type()?;
+                    ty = AstType::UnionOf(Box::new(ty), Box::new(other_type));
+                },
+                _ => break
+            }
+        }
+
+        Ok(ty)
+    }
+
+    pub fn parse_base_type(&mut self) -> Result<AstType, (String, Span)> {
         let identifier = self.parse_identifier()?;
         match identifier.name.as_str() {
             "i32" => Ok(AstType::Int32),

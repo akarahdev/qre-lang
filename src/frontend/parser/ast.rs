@@ -138,4 +138,6 @@ pub enum AstType {
     Structure(PathData),
     Void,
     Invalid,
+    
+    UnionOf(Box<AstType>, Box<AstType>)
 }

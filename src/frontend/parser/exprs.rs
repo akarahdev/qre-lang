@@ -18,7 +18,7 @@ impl Parser {
             let rhs = self.parse_factor()?;
 
             match rhs {
-                AstExpression::Invoke { receiver, arguments, open_paren_span, close_paren_tok, return_type } => {
+                AstExpression::Invoke { receiver, arguments, open_paren_span, close_paren_tok, return_type, resolve_as_ufcs } => {
                     let mut tmp_args = Vec::with_capacity(arguments.len() + 1);
                     tmp_args.push(expr);
                     tmp_args.extend(arguments);
