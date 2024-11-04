@@ -118,6 +118,7 @@ pub enum AstExpression {
         return_type: OnceCell<AstType>,
         open_paren_span: Token,
         close_paren_tok: Token,
+        resolve_as_ufcs: bool
     },
 
     Index {

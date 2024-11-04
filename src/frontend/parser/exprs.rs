@@ -29,7 +29,8 @@ impl Parser {
                         arguments: tmp_args,
                         open_paren_span,
                         close_paren_tok,
-                        return_type
+                        return_type,
+                        resolve_as_ufcs: true
                     }
                 }
                 _ => self.errors.push((
@@ -170,6 +171,7 @@ impl Parser {
                         return_type: OnceCell::new(),
                         open_paren_span: tok,
                         close_paren_tok,
+                        resolve_as_ufcs: false
                     }
                 }
                 _ => break
