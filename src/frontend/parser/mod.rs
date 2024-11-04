@@ -10,7 +10,7 @@ macro_rules! match_token_type {
     (in $self:expr, let $name:ident: $ty:expr => $token_type:pat) => {
         let Some($name) = $self.tokens.next().clone() else {
             $self.errors.push((
-                "expected OpenParen, found EOF".to_string(),
+                format!("expected {:?}, found EOF", $ty),
                 $self.tokens.vector.last().unwrap().clone().span,
             ));
             return None;
