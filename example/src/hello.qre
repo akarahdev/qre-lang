@@ -5,5 +5,5 @@ struct Example {
 }
 
 fn main() -> i32 {
-    2 + 2;
+
 }

@@ -119,6 +119,12 @@ pub enum AstExpression {
         open_paren_span: Token,
         close_paren_tok: Token,
     },
+
+    Index {
+        ty: OnceCell<AstType>,
+        base: Box<AstExpression>,
+        other: Box<AstExpression>,
+    },
 }
 
 #[derive(Debug, Clone)]

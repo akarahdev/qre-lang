@@ -3,6 +3,7 @@ use crate::frontend::parser::ast::AstExpression;
 use crate::frontend::parser::core::Parser;
 use crate::frontend::span::Span;
 use std::cell::OnceCell;
+use crate::match_token_type;
 
 impl Parser {
     pub(crate) fn parse_expression(&mut self) -> Result<AstExpression, (String, Span)> {
@@ -40,12 +41,12 @@ impl Parser {
     }
 
     fn parse_term(&mut self) -> Result<AstExpression, (String, Span)> {
-        let mut expr = self.parse_base_value();
+        let mut expr = self.parse_postfix_exprs();
         while let Some(tok) = self.tokens.peek().cloned() {
             match tok.token_type {
                 TokenType::Plus => {
                     self.tokens.next();
-                    let rhs = self.parse_base_value()?;
+                    let rhs = self.parse_postfix_exprs()?;
                     expr = expr.map(|lhs| AstExpression::Add {
                         ty: OnceCell::new(),
                         lhs: Box::new(lhs),
@@ -55,7 +56,7 @@ impl Parser {
                 }
                 TokenType::Minus => {
                     self.tokens.next();
-                    let rhs = self.parse_base_value()?;
+                    let rhs = self.parse_postfix_exprs()?;
                     expr = expr.map(|lhs| AstExpression::Sub {
                         ty: OnceCell::new(),
                         lhs: Box::new(lhs),
@@ -67,6 +68,41 @@ impl Parser {
             };
         }
         expr
+    }
+
+    fn parse_postfix_exprs(&mut self) -> Result<AstExpression, (String, Span)> {
+        let mut expr = self.parse_base_value()?;
+        while let Some(tok) = self.tokens.peek().cloned() {
+            match tok.token_type {
+                TokenType::OpenBracket => {
+                    self.tokens.next();
+                    
+                    let index_by = self.parse_expression()?;
+                    
+                    let Some(close_brack_tok) = self.tokens.peek().cloned() else {
+                        return Err((
+                            "expected CloseBracket, found EOF".to_string(),
+                            self.tokens.vector.last().cloned().unwrap().span,
+                        ));
+                    };
+                    let TokenType::CloseBracket = &close_brack_tok.token_type else {
+                        return Err((
+                            format!("expected CloseBracket, found {:?}", &close_brack_tok.token_type),
+                            close_brack_tok.span,
+                        ));
+                    };
+                    self.tokens.next();
+                    
+                    expr = AstExpression::Index {
+                        ty: OnceCell::new(),
+                        base: Box::new(expr),
+                        other: Box::new(index_by),
+                    }
+                }
+                _ => break
+            };
+        }
+        Ok(expr)
     }
 
     fn parse_base_value(&mut self) -> Result<AstExpression, (String, Span)> {
