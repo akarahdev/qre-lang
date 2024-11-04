@@ -103,7 +103,7 @@ impl Lexer {
                     let mut content = String::new();
                     content.push(ch);
 
-                    while self.peek_char().is_alphanumeric() {
+                    while self.peek_char().is_alphanumeric() || self.peek_char() == '_' {
                         content.push(self.read_char());
                     }
                     if !content.is_empty() {

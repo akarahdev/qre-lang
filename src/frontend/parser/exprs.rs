@@ -76,9 +76,9 @@ impl Parser {
             match tok.token_type {
                 TokenType::OpenBracket => {
                     self.tokens.next();
-                    
+
                     let index_by = self.parse_expression()?;
-                    
+
                     let Some(close_brack_tok) = self.tokens.peek().cloned() else {
                         return Err((
                             "expected CloseBracket, found EOF".to_string(),
@@ -87,16 +87,53 @@ impl Parser {
                     };
                     let TokenType::CloseBracket = &close_brack_tok.token_type else {
                         return Err((
-                            format!("expected CloseBracket, found {:?}", &close_brack_tok.token_type),
+                            format!("expected CloseBracket, found {:?}", close_brack_tok.token_type),
                             close_brack_tok.span,
                         ));
                     };
                     self.tokens.next();
-                    
+
                     expr = AstExpression::Index {
                         ty: OnceCell::new(),
                         base: Box::new(expr),
                         other: Box::new(index_by),
+                    }
+                }
+                TokenType::OpenParen => {
+                    self.tokens.next();
+
+                    let mut arguments = Vec::new();
+                    loop {
+                        let arg = self.parse_expression()?;
+                        arguments.push(arg);
+
+                        if let Some(peeked) = self.tokens.peek().cloned()
+                            && peeked.token_type != TokenType::Comma {
+                            break;
+                        };
+                        self.tokens.next();
+                    }
+
+                    let Some(close_paren_tok) = self.tokens.peek().cloned() else {
+                        return Err((
+                            "expected CloseParen, found EOF".to_string(),
+                            self.tokens.vector.last().cloned().unwrap().span,
+                        ));
+                    };
+                    let TokenType::CloseParen = &close_paren_tok.token_type else {
+                        return Err((
+                            format!("expected CloseParen, found {:?}", close_paren_tok.token_type),
+                            close_paren_tok.span,
+                        ));
+                    };
+                    self.tokens.next();
+
+                    expr = AstExpression::Invoke {
+                        receiver: Box::new(expr),
+                        arguments,
+                        return_type: OnceCell::new(),
+                        open_paren_span: tok,
+                        close_paren_tok,
                     }
                 }
                 _ => break
@@ -118,6 +155,11 @@ impl Parser {
                 content,
                 ty: OnceCell::new(),
                 token: tok.clone(),
+            }),
+            TokenType::Identifier { content} => Ok(AstExpression::VariableLiteral {
+                content,
+                ty: OnceCell::new(),
+                token: tok,
             }),
             _ => Err((
                 format!("expected base value, found {:?}", tok.clone().token_type),
