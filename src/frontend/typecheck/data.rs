@@ -4,11 +4,11 @@ use crate::frontend::parser::ast::{AstType, PathData};
 #[derive(Debug, Clone)]
 pub enum ProgramType {
     Structure {
-        name: PathData,
+        name: String,
         fields: Vec<(String, AstType)>
     },
     Function {
-        name: PathData,
+        name: String,
         arguments: Vec<(String, AstType)>,
         returns: AstType
     }
@@ -16,5 +16,5 @@ pub enum ProgramType {
 
 #[derive(Debug, Clone)]
 pub struct TypeInformation {
-    pub names: HashMap<PathData, ProgramType>
+    pub names: HashMap<String, ProgramType>
 }
