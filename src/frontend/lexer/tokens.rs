@@ -1,12 +1,12 @@
 use crate::frontend::span::Span;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub struct Token {
     pub token_type: TokenType,
     pub span: Span,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TokenType {
     Identifier { content: String },
     StringValue { content: String },

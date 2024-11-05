@@ -25,7 +25,7 @@ pub enum QIRHeader {
 }
 
 pub struct QIRBasicBlock {
-    exprs: Vec<QIRExpression>
+    pub(crate) exprs: Vec<QIRExpression>
 }
 
 pub enum QIRExpression {
@@ -50,7 +50,7 @@ pub enum QIRExpression {
     },
     /// Always creates a QIRType::Ptr type value
     InstantiateStructure {
-        name: PathData
+        size: i32
     },
     /// Stores a value to a Ptr
     StoreToPtr {

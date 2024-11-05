@@ -33,13 +33,13 @@ impl Parser {
             let Some(possibly_double_colon) = self.tokens.peek() else {
                 return Ok(PathData {
                     name: final_identifier,
-                    tokens,
+                    token: tokens.first().cloned().unwrap(),
                 });
             };
             let TokenType::DoubleColon = possibly_double_colon.token_type else {
                 return Ok(PathData {
                     name: final_identifier,
-                    tokens,
+                    token: tokens.first().cloned().unwrap(),
                 });
             };
             self.tokens.next();

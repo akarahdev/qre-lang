@@ -1,7 +1,7 @@
 use crate::frontend::lexer::tokens::Token;
 use std::cell::OnceCell;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum AstHeader {
     Import(String),
     Function {
@@ -16,12 +16,12 @@ pub enum AstHeader {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct AstCodeBlock {
     pub statements: Vec<AstStatement>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum AstStatement {
     Comment(String),
     Expression(AstExpression),
@@ -42,13 +42,13 @@ pub enum AstStatement {
     },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct PathData {
     pub(crate) name: String,
-    pub(crate) tokens: Vec<Token>,
+    pub(crate) token: Token,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum AstExpression {
     NumberLiteral {
         content: String,
@@ -128,7 +128,7 @@ pub enum AstExpression {
     },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum AstType {
     Int32,
     Int64,
