@@ -7,6 +7,7 @@ use frontend::parser::core::Parser;
 use std::fs::read_to_string;
 
 mod frontend;
+mod backend;
 
 fn main() {
     let entries = std::fs::read_dir("./src/").unwrap();
