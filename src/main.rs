@@ -1,17 +1,18 @@
 #![feature(let_chains)]
 #![allow(dead_code)]
 
-use std::alloc::System;
-use std::collections::HashMap;
 use crate::frontend::lexer::iter::TokenIterator;
 use crate::frontend::lexer::structs::Lexer;
+use crate::frontend::typecheck::data::TypeInformation;
 use frontend::parser::core::Parser;
+use std::alloc::System;
+use std::collections::HashMap;
 use std::fs::read_to_string;
 use std::process::exit;
-use crate::frontend::typecheck::data::TypeInformation;
+use crate::frontend::parser::ast::AstHeader;
 
-mod frontend;
 mod backend;
+mod frontend;
 
 fn main() {
     let entries = std::fs::read_dir("./src/").unwrap();
@@ -45,8 +46,8 @@ fn main() {
     let ast = parser.parse();
 
     println!("Parsing: {:#?}", ast);
-    
-    let Ok(headers) = ast else {
+
+    let Ok(mut headers) = ast else {
         println!("Errs: {:#?}", ast.unwrap_err());
         exit(1);
     };
@@ -54,8 +55,19 @@ fn main() {
     let mut type_info = TypeInformation {
         names: HashMap::new(),
     };
-    headers.iter().for_each(|x| x.gather_type_information(&mut type_info));
-    
+    headers
+        .iter()
+        .for_each(|x| x.gather_type_information(&mut type_info));
+
+    for header in &mut headers {
+        if let AstHeader::Function { ref mut code_block, ref mut locals, .. } = header {
+            code_block.annotate_type_information(
+                &mut type_info,
+                locals
+            );
+        }
+    }
+
     println!("Types: {:#?}", type_info);
-    
+    println!("Annotated: {:#?}", headers);
 }

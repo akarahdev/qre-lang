@@ -2,8 +2,8 @@ use crate::frontend::lexer::tokens::TokenType;
 use crate::frontend::parser::ast::AstExpression;
 use crate::frontend::parser::core::Parser;
 use crate::frontend::span::Span;
-use std::cell::OnceCell;
 use crate::match_token_type;
+use std::cell::OnceCell;
 
 impl Parser {
     pub(crate) fn parse_expression(&mut self) -> Result<AstExpression, (String, Span)> {
@@ -13,16 +13,23 @@ impl Parser {
     fn parse_ufcs(&mut self) -> Result<AstExpression, (String, Span)> {
         let mut expr = self.parse_factor()?;
         while let Some(tok) = self.tokens.peek().cloned()
-            && tok.token_type == TokenType::Dot {
+            && tok.token_type == TokenType::Dot
+        {
             self.tokens.next();
             let rhs = self.parse_factor()?;
 
             match rhs {
-                AstExpression::Invoke { receiver, arguments, open_paren_span, close_paren_tok, return_type, resolve_as_ufcs } => {
+                AstExpression::Invoke {
+                    receiver,
+                    arguments,
+                    open_paren_span,
+                    close_paren_tok,
+                    return_type,
+                    resolve_as_ufcs,
+                } => {
                     let mut tmp_args = Vec::with_capacity(arguments.len() + 1);
                     tmp_args.push(expr);
                     tmp_args.extend(arguments);
-                    
 
                     expr = AstExpression::Invoke {
                         receiver,
@@ -30,12 +37,12 @@ impl Parser {
                         open_paren_span,
                         close_paren_tok,
                         return_type,
-                        resolve_as_ufcs: true
+                        resolve_as_ufcs: true,
                     }
                 }
                 _ => self.errors.push((
                     "UFCS must be followed by a function invocation".to_string(),
-                    tok.span.clone()
+                    tok.span.clone(),
                 )),
             }
         }
@@ -119,7 +126,10 @@ impl Parser {
                     };
                     let TokenType::CloseBracket = &close_brack_tok.token_type else {
                         return Err((
-                            format!("expected CloseBracket, found {:?}", close_brack_tok.token_type),
+                            format!(
+                                "expected CloseBracket, found {:?}",
+                                close_brack_tok.token_type
+                            ),
                             close_brack_tok.span,
                         ));
                     };
@@ -137,15 +147,17 @@ impl Parser {
                     let mut arguments = Vec::new();
                     loop {
                         if let Some(peeked) = self.tokens.peek().cloned()
-                            && peeked.token_type == TokenType::CloseParen {
+                            && peeked.token_type == TokenType::CloseParen
+                        {
                             break;
                         };
-                        
+
                         let arg = self.parse_expression()?;
                         arguments.push(arg);
 
                         if let Some(peeked) = self.tokens.peek().cloned()
-                            && peeked.token_type != TokenType::Comma {
+                            && peeked.token_type != TokenType::Comma
+                        {
                             break;
                         };
                         self.tokens.next();
@@ -159,7 +171,10 @@ impl Parser {
                     };
                     let TokenType::CloseParen = &close_paren_tok.token_type else {
                         return Err((
-                            format!("expected CloseParen, found {:?}", close_paren_tok.token_type),
+                            format!(
+                                "expected CloseParen, found {:?}",
+                                close_paren_tok.token_type
+                            ),
                             close_paren_tok.span,
                         ));
                     };
@@ -171,10 +186,10 @@ impl Parser {
                         return_type: OnceCell::new(),
                         open_paren_span: tok,
                         close_paren_tok,
-                        resolve_as_ufcs: false
+                        resolve_as_ufcs: false,
                     }
                 }
-                _ => break
+                _ => break,
             };
         }
         Ok(expr)
@@ -194,7 +209,7 @@ impl Parser {
                 ty: OnceCell::new(),
                 token: tok.clone(),
             }),
-            TokenType::Identifier { content} => Ok(AstExpression::VariableLiteral {
+            TokenType::Identifier { content } => Ok(AstExpression::VariableLiteral {
                 content,
                 ty: OnceCell::new(),
                 token: tok,

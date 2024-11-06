@@ -1,9 +1,9 @@
-use std::collections::HashMap;
 use crate::frontend::lexer::tokens::TokenType;
 use crate::frontend::parser::ast::{AstCodeBlock, AstStatement};
 use crate::frontend::parser::core::Parser;
 use crate::frontend::span::Span;
 use crate::match_token_type;
+use std::collections::HashMap;
 
 impl Parser {
     pub fn parse_code_block(&mut self) -> Option<AstCodeBlock> {

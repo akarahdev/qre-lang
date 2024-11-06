@@ -11,6 +11,10 @@ pub struct Span {
 
 impl Debug for Span {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[row {}, {}:{} in {}]", self.row_start, self.column_start, self.column_end, self.file_name)
+        write!(
+            f,
+            "[row {}, {}:{} in {}]",
+            self.row_start, self.column_start, self.column_end, self.file_name
+        )
     }
 }

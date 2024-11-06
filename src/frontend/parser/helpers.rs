@@ -60,8 +60,8 @@ impl Parser {
                     self.tokens.next();
                     let other_type = self.parse_type()?;
                     ty = AstType::UnionOf(Box::new(ty), Box::new(other_type));
-                },
-                _ => break
+                }
+                _ => break,
             }
         }
 

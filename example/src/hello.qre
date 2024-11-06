@@ -3,5 +3,5 @@ import std::io
 struct std::none {}
 
 fn test() -> i32 {
-
+    2 + 2;
 }

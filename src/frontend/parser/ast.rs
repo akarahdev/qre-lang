@@ -10,17 +10,17 @@ pub enum AstHeader {
         parameters: Vec<(AstType, String)>,
         returns: AstType,
         code_block: AstCodeBlock,
-        locals: HashMap<String, AstType>
+        locals: HashMap<String, AstType>,
     },
     Struct {
         name: PathData,
-        fields: Vec<(String, AstType)>
-    }
+        fields: Vec<(String, AstType)>,
+    },
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct AstCodeBlock {
-    pub statements: Vec<AstStatement>
+    pub statements: Vec<AstStatement>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -120,7 +120,7 @@ pub enum AstExpression {
         return_type: OnceCell<AstType>,
         open_paren_span: Token,
         close_paren_tok: Token,
-        resolve_as_ufcs: bool
+        resolve_as_ufcs: bool,
     },
 
     Index {
@@ -140,6 +140,6 @@ pub enum AstType {
     Structure(String),
     Void,
     Invalid,
-    
-    UnionOf(Box<AstType>, Box<AstType>)
+
+    UnionOf(Box<AstType>, Box<AstType>),
 }

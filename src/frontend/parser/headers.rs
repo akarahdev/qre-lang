@@ -1,9 +1,9 @@
-use std::collections::HashMap;
 use crate::frontend::lexer::tokens::TokenType;
 use crate::frontend::parser::ast::AstHeader::Import;
 use crate::frontend::parser::ast::{AstHeader, AstType};
 use crate::frontend::parser::core::Parser;
 use crate::match_token_type;
+use std::collections::HashMap;
 
 impl Parser {
     pub fn parse_to_headers(&mut self) -> Vec<AstHeader> {
@@ -27,9 +27,7 @@ impl Parser {
                 }
             },
             TokenType::FnKeyword => self.parse_function(),
-            TokenType::StructKeyword => {
-                self.parse_struct()
-            }
+            TokenType::StructKeyword => self.parse_struct(),
             _ => {
                 self.errors.push((
                     format!(
@@ -67,22 +65,17 @@ impl Parser {
                     };
                     fields.push((content.clone(), ty));
                     match_token_type!(in self, let semicolon: TokenType::Semicolon => TokenType::Semicolon);
-                },
-                ty => {
-                    self.errors.push((
-                        format!("expected Identifier or CloseBrace, got {:?}", ty),
-                        next_tok.clone().span
-                    ))
                 }
+                ty => self.errors.push((
+                    format!("expected Identifier or CloseBrace, got {:?}", ty),
+                    next_tok.clone().span,
+                )),
             }
         }
 
         match_token_type!(in self, let close_brace_tok: TokenType::CloseParen => TokenType::CloseBrace);
 
-        Some(AstHeader::Struct {
-            name,
-            fields
-        })
+        Some(AstHeader::Struct { name, fields })
     }
 
     pub fn parse_function(&mut self) -> Option<AstHeader> {
@@ -111,7 +104,7 @@ impl Parser {
             parameters: vec![],
             returns: return_type,
             code_block,
-            locals: HashMap::new()
+            locals: HashMap::new(),
         })
     }
 }
