@@ -1,5 +1,6 @@
 use crate::frontend::lexer::tokens::Token;
 use std::cell::OnceCell;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum AstHeader {
@@ -9,6 +10,7 @@ pub enum AstHeader {
         parameters: Vec<(AstType, String)>,
         returns: AstType,
         code_block: AstCodeBlock,
+        locals: HashMap<String, AstType>
     },
     Struct {
         name: PathData,
@@ -18,7 +20,7 @@ pub enum AstHeader {
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct AstCodeBlock {
-    pub statements: Vec<AstStatement>,
+    pub statements: Vec<AstStatement>
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -135,7 +137,7 @@ pub enum AstType {
     Float32,
     Float64,
     ArrayOf(Box<AstType>),
-    Structure(PathData),
+    Structure(String),
     Void,
     Invalid,
     

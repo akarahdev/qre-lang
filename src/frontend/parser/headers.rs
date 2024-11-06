@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::frontend::lexer::tokens::TokenType;
 use crate::frontend::parser::ast::AstHeader::Import;
 use crate::frontend::parser::ast::{AstHeader, AstType};
@@ -110,6 +111,7 @@ impl Parser {
             parameters: vec![],
             returns: return_type,
             code_block,
+            locals: HashMap::new()
         })
     }
 }
